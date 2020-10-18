@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baizhi.dao.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.baizhi.entity.User">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="mobile" property="mobile" />
+        <result column="sign" property="sign" />
+        <result column="head_show" property="headShow" />
+        <result column="status" property="status" />
+        <result column="reg_time" property="regTime" />
+        <result column="score" property="score" />
+        <result column="wechat" property="wechat" />
+        <result column="city_id" property="cityId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, username, mobile, sign, head_show, status, reg_time, score, wechat,cityId
+    </sql>
+
+    <resultMap id="res1" type="com.baizhi.entity.User">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="sex" property="sex" />
+        <result column="mobile" property="mobile" />
+        <result column="sign" property="sign" />
+        <result column="head_show" property="headShow" />
+        <result column="status" property="status" />
+        <result column="reg_time" property="regTime" />
+        <result column="score" property="score" />
+        <result column="wechat" property="wechat" />
+        <association  property="fcity" javaType="com.baizhi.entity.City">
+            <result  column="name" property="cname"/>
+        </association>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <select id="selectAllUser" resultMap="res1">
+      select  u.id, u.username,u.sex, u.mobile, u.sign, u.head_show, u.status, u.reg_time, u.score, u.wechat,c.name cname
+      from  yx_user u left join cities c
+      on  u.city_id=c.id
+      limit #{begin},#{rows}
+    </select>
+
+    <!-- 统计视图 -->
+    <select id="selectView" resultType="com.baizhi.entity.User">
+        select CONCAT(month(reg_time),'月') month,sex,count(id) count
+        from yx_user where sex=#{sex}  group by month(reg_time)
+    </select>
+
+    <resultMap id="res2" type="com.baizhi.entity.User">
+        <id column="id" property="id" />
+        <result column="sex" property="sex" />
+        <result column="cityCount" property="cityCount" />
+        <association  property="fcity" javaType="com.baizhi.entity.City">
+            <result  column="name" property="name"/>
+        </association>
+    </resultMap>
+
+    <!-- 统计地图 -->
+    <select id="selectUserMap" resultMap="res2">
+        select c.name name,u.sex,count(u.id) cityCount
+        from yx_user  u LEFT JOIN cities c
+        on u.city_id=c.id
+        where  sex=#{sex}  group by name
+    </select>
+
+</mapper>
